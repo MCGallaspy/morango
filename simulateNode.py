@@ -1,30 +1,15 @@
+"""
+A Node represents a data store with many records.
+"""
 from __future__ import print_function, unicode_literals
 
 from storeRecord import StoreRecord
 from syncSession import SyncSession
 from copy import deepcopy
-import random
 import hashlib
 
 
 class Node:
-    # Morango instance ID
-    instanceID = None
-    # Morango Counter position
-    counter = None
-    # Sync data structure
-    syncDataStructure = None
-    # Contents of Store
-    store = None
-    # Contents of Incoming Buffer
-    incomingBuffer = None
-    # Contents of Outgoing Buffer
-    outgoingBuffer = None
-    # Imitation of application data
-    appData = None
-    # Dictionary of session objects
-    sessions = None
-
     ALL = ""
     GENERIC = None
 
