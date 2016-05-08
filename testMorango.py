@@ -531,16 +531,15 @@ class Test(unittest.TestCase):
 
     def test_multipleEventualFullMerge(self):
         temp = []
-        f = open("mergeStats", "a+")
-
-        for j in range(3, 10):
-            for i in range(10):
-                temp.append(self.eventualFullMerge(j))
-            f.write(str(j))
-            f.write("\n")
-            f.write(str(temp))
-            f.write("\n")
-            del temp[:]
+        with open("mergeStats", "a+") as f:
+            for j in range(3, 10):
+                for i in range(10):
+                    temp.append(self.eventualFullMerge(j))
+                f.write(str(j))
+                f.write("\n")
+                f.write(str(temp))
+                f.write("\n")
+                del temp[:]
 
     def eventualFullDiff(self, networkSize):
         nodeList = self.createNodes(networkSize)
@@ -596,20 +595,19 @@ class Test(unittest.TestCase):
         return total
 
     def test_eventualFullDiff(self):
-        f = open("rand", "a+")
-
-        temp = []
-        for j in range(5):
-            print(j)
-            f.write(str(j))
-            f.write("\n")
-            (start, end) = self.createRandomRange(1, 5)
-            for k in range(5):
-                for i in range(10):
-                    temp.append(self.eventualFullDiffBi(j, k * 10, start, end))
-                f.write(str(temp))
+        with open("rand", "a+") as f:
+            temp = []
+            for j in range(5):
+                print(j)
+                f.write(str(j))
                 f.write("\n")
-                del temp[:]
+                (start, end) = self.createRandomRange(1, 5)
+                for k in range(5):
+                    for i in range(10):
+                        temp.append(self.eventualFullDiffBi(j, k * 10, start, end))
+                    f.write(str(temp))
+                    f.write("\n")
+                    del temp[:]
 
     def eventualStarDiff(self, starSize):
         nodeList = self.createNodes(starSize)
@@ -643,17 +641,16 @@ class Test(unittest.TestCase):
 
     def test_multipleEventualStarDiff(self):
         temp = []
-        f = open("rand2", "a+")
-
-        for j in range(4):
-            for i in range(1):
-                temp.append(self.eventualStarDiffBi(j))
-            print(j)
-            f.write(str(j))
-            f.write("\n")
-            f.write(str(temp))
-            f.write("\n")
-            del temp[:]
+        with open("rand2", "a+") as f:
+            for j in range(4):
+                for i in range(1):
+                    temp.append(self.eventualStarDiffBi(j))
+                print(j)
+                f.write(str(j))
+                f.write("\n")
+                f.write(str(temp))
+                f.write("\n")
+                del temp[:]
 
 
 if __name__ == '__main__':
