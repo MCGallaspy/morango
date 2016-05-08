@@ -47,22 +47,17 @@ class Node:
                 return i
         return -1
 
-    def changeTuple(self, tupleOld, index, value):
-        tupleNew = list(tupleOld)
-        tupleNew[index] = value
-        return tuple(tupleNew)
-
     def addAppData(self, recordID, recordData, partitionFacility, partitionUser):
         """
         Adding records to the application
         """
         recordIndex = self.searchRecordInApp(recordID)
         if recordIndex >= 0:
-            self.appData[recordIndex] = self.changeTuple(self.appData[recordIndex], 1, recordData)
-            self.appData[recordIndex] = self.changeTuple(self.appData[recordIndex], 2, 1)
+            self.appData[recordIndex][1] = recordData
+            self.appData[recordIndex][2] = 1
         else:
             # Third argument is the dirty bit which will always be set for new data
-            self.appData.append((recordID, recordData, 1, partitionFacility, partitionUser))
+            self.appData.append([recordID, recordData, 1, partitionFacility, partitionUser])
 
     def superSetFilters(self, filter):
         """
@@ -213,7 +208,7 @@ class Node:
                                          tempAppData[4])
                 self.store[str(tempAppData[0])] = record
                 # Clear dirty bit from data residing in the application
-                self.appData[i] = self.appData[i][:2] + (0,) + tuple(self.appData[i][-2])
+                self.appData[i] = self.appData[i][:2] + [0, self.appData[i][-2]]
                 # Making changes to Sync Data Structure
                 self.syncDataStructure["+"][str(self.instanceID)] = self.counter
 
@@ -265,8 +260,7 @@ class Node:
         Not adding the record to appData yet
         """
         # Dirty bit is turned off by default
-        return (record.recordID, record.recordData, 0, record.partitionFacility, \
-                record.partitionUser)
+        return [record.recordID, record.recordData, 0, record.partitionFacility, record.partitionUser]
 
     def editRecordInStore(self, recordID, recordData, instanceID, counter, history):
         self.store[recordID].recordData = recordData
@@ -278,7 +272,7 @@ class Node:
         recordIndex = self.searchRecordInApp(record.recordID)
         storeRecordHistory = self.store[record.recordID].lastSavedByHistory
 
-        self.appData[recordIndex] = self.changeTuple(self.appData[recordIndex], 1, record.recordData)
+        self.appData[recordIndex][1] = record.recordData
         if len(hist) > 0:
             history = self.giveMaxDict([record.lastSavedByHistory, storeRecordHistory, hist])
             self.editRecordInStore(record.recordID, record.recordData, self.instanceID, self.counter, history)
@@ -351,7 +345,7 @@ class Node:
                 # Dirty bit for the record is set
                 else:
                     self.updateCounter()
-                    self.appData[recordIndex] = self.changeTuple(self.appData[recordIndex], 2, 0)
+                    self.appData[recordIndex][2] = 2
                     # Merge conflict resolution did not choose the app Data
                     if self.resolveMergeConflict(inflatedIncomingBufferRecord, recordIndex):
                         self.bufferDataChosen(record, {self.instanceID: self.counter})
@@ -381,7 +375,7 @@ class Node:
 
                     # Chooses app Data
                     else:
-                        self.appData[recordIndex] = self.changeTuple(self.appData[recordIndex], 2, 0)
+                        self.appData[recordIndex][2] = 0
                         self.store[record.recordID] = deepcopy(record)
                         self.appDataChosen(record, {self.instanceID: self.counter})
 
