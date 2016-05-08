@@ -6,11 +6,11 @@ from __future__ import print_function, unicode_literals
 from storeRecord import StoreRecord
 from syncSession import SyncSession
 from copy import deepcopy
+
 import hashlib
 
 
 class Node:
-    ALL = ""
     GENERIC = None
 
     def __init__(self, instanceID):
@@ -23,7 +23,7 @@ class Node:
         # Initiate a node with counter position 0
         self.counter = 0
         # Add an entry for full replication containing own instance ID and counter position
-        self.syncDataStructure = {Node.ALL + "+" + Node.ALL: {str(self.instanceID): self.counter}}
+        self.syncDataStructure = {"+": {str(self.instanceID): self.counter}}
         self.store = {}
         self.incomingBuffer = {}
         self.appData = []
@@ -35,7 +35,7 @@ class Node:
         Increment counter by 1 when data is saved/modified
         """
         self.counter = self.counter + 1
-        self.syncDataStructure[Node.ALL + "+" + Node.ALL][str(self.instanceID)] = self.counter
+        self.syncDataStructure["+"][str(self.instanceID)] = self.counter
 
     def searchRecordInApp(self, recordID):
         """
@@ -71,16 +71,16 @@ class Node:
         """
         superSet = []
         # Add the full replication entry from Sync Data Structure
-        if Node.ALL + "+" + Node.ALL in self.syncDataStructure:
-            superSet.append(Node.ALL + "+" + Node.ALL)
+        if "+" in self.syncDataStructure:
+            superSet.append("+")
         else:
             raise ValueError("No full replication entry in Sync Datastructure of node " + self.instanceID)
 
-        if filter[0] != Node.ALL:
-            if filter[0] + "+" + Node.ALL in self.syncDataStructure:
-                superSet.append(filter[0] + "+" + Node.ALL)
+        if filter[0]:
+            if filter[0] + "+" in self.syncDataStructure:
+                superSet.append(filter[0] + "+")
             # User partition is specifically mentioned
-            if filter[1] != Node.ALL:
+            if filter[1] :
                 if filter[0] + "+" + filter[1] in self.syncDataStructure:
                     superSet.append(filter[0] + "+" + filter[1])
         return superSet
@@ -138,15 +138,15 @@ class Node:
         """
         Return a boolean value if filter1 is a subset of filter2
         """
-        if filter2[0] == Node.ALL and filter2[1] == Node.ALL:
+        if not filter2[0] and not filter2[1]:
             return True
-        elif filter2[0] == Node.ALL and filter2[1] != Node.ALL:
+        elif not filter2[0] and filter2[1]:
             raise ValueError("Facility ALL but User not ALL")
-        elif filter2[0] != Node.ALL:
+        elif filter2[0]:
             if filter1[0] == filter2[0]:
-                if filter2[1] == Node.ALL:
+                if not filter2[1]:
                     return True
-                elif filter2[1] != Node.ALL and filter2[1] == filter1[1]:
+                elif filter2[1] and filter2[1] == filter1[1]:
                     return True
         return False
 
@@ -215,7 +215,7 @@ class Node:
                 # Clear dirty bit from data residing in the application
                 self.appData[i] = self.appData[i][:2] + (0,) + tuple(self.appData[i][-2])
                 # Making changes to Sync Data Structure
-                self.syncDataStructure[Node.ALL + "+" + Node.ALL][str(self.instanceID)] = self.counter
+                self.syncDataStructure["+"][str(self.instanceID)] = self.counter
 
     def integrate(self):
         for key, value in list(self.incomingBuffer.items()):
