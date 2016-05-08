@@ -42,8 +42,8 @@ class Node:
         Returns index of the record in appData if it exists,
         -1 otherwise
         """
-        for i in range(len(self.appData)):
-            if self.appData[i][0] == recordID:
+        for i, record in enumerate(self.appData):
+            if record[0] == recordID:
                 return i
         return -1
 
