@@ -413,7 +413,7 @@ class Node:
 
     def initialHandshake(self, ID, clientInstance):
         """
-       Store sync session details you have received from Client
+        Store sync session details you have received from Client
         """
         self.sessions[ID] = SyncSession(ID, clientInstance, None)
 
@@ -496,25 +496,16 @@ class Node:
         """
         Pretty-printing all the variable values residing in Node object
         """
-        print
-        "Instance ID :" + str(self.instanceID)
-        print
-        "Counter value :" + str(self.counter)
-        print
-        "appData :"
+        print("Instance ID :" + str(self.instanceID))
+        print("Counter value :" + str(self.counter))
+        print("appData :")
         for i in range(0, len(self.appData)):
-            print
-            self.appData[i]
-        print
-        "syncDataStructure :"
+            print(self.appData[i])
+        print("syncDataStructure :")
         for key, value in self.syncDataStructure.items():
-            print
-            key + ":"
-            print
-            value
-        print
-        "Store :"
+            print(key + ":")
+            print(value)
+        print("Store :")
         for key, value in self.store.items():
-            print
-            key + ":"
+            print(key + ":")
             value.printStoreRecord()
